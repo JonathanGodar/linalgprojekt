@@ -18,14 +18,10 @@ def tokenize_comment(comment):
     # comments.append(cleaned_text)
 
 def load_comments(file):
-    print("Hello?")
     comments_json = json.load(open(file))
 
-    comments = list(map(lambda comment: tokenize_comment(comment), comments_json.values()))
-    print(comments)
+    comments = list(filter(lambda comment: len(comment) != 0, map(lambda comment: tokenize_comment(comment), comments_json.values())))
     return comments
-
-
 
 # # Assuming you have loaded your JSON data into a variable named 'data'
 # # For example, if your data is in a file named 'datacomment.json', you would load it like this:

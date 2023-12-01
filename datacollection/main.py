@@ -64,7 +64,7 @@ def get_comments_from_subreddit(subreddit: str, hello):
 
 def main():
     load_dotenv()
-    get_comments_from_subreddit('relationship_advice', True)
+    get_comments_from_subreddit('techsupport', True)
     # api = PushshiftAPI()
 
     # api.search_comments(subreddit="relationship_advice")

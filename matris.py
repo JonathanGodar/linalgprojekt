@@ -8,6 +8,10 @@ with open('datacomment.json', 'r') as file:
 comments = []
 # Loop through each comment in the data
 i=0
+comments = data['data'] # [Commentarer + medata]
+
+comments = comments[1].body
+
 for comment in data['data']:
     # Access the text in the 'body' field
     body_text = comment['body']

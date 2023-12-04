@@ -1,6 +1,7 @@
 import numpy as np
 import random
 import nltk
+import keyword_extraction
 #nltk.download('averaged_perceptron_tagger')
 punct = '.,!?'
 
@@ -26,7 +27,7 @@ def read_text(comments):
     except Exceptionerror:
         return False'''
 
-def init_matrix(tokens, vocab, comments):
+def init_matrix(tokens, vocab, comments, keyword_dict):
 # Initialize transition matrix
 
     matrix_size = len(tokens)
@@ -38,7 +39,10 @@ def init_matrix(tokens, vocab, comments):
             curr_word, next_word = comment[i], comment[i + 1]
             #if word_check(curr_word, next_word):
             #   transition_matrix[vocab[next_word]][vocab[curr_word]] += 10
-            transition_matrix[vocab[next_word]][vocab[curr_word]] += 1
+            if next_word in keyword_dict and transition_matrix[vocab[next_word]][vocab[curr_word]] < 100:
+                transition_matrix[vocab[next_word]][vocab[curr_word]] += 10 * keyword_dict[next_word]
+            else:        
+                transition_matrix[vocab[next_word]][vocab[curr_word]] += 1
 
 # Convert counts to probabilities
     transition_matrix = transition_matrix / transition_matrix.sum(axis=0, keepdims=True)
@@ -76,7 +80,12 @@ def main(comments, n):
     comments = read_text(comments) # 2d array of tokens
     tokens = list(set(word for comment in comments for word in comment))
     vocab = {word: i for i, word in enumerate(tokens)}
-    transition_matrix = init_matrix(tokens, vocab, comments)
+
+
+    keyword_dict = keyword_extraction.keyword_extraction(input('Eder fråga, ädle riddare:'))
+
+
+    transition_matrix = init_matrix(tokens, vocab, comments, keyword_dict)
     random_walk(transition_matrix, n, tokens, vocab)
 
 

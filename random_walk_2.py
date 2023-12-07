@@ -42,7 +42,7 @@ def init_matrix(tokens, vocab, comments, keyword_dict):
             #if word_check(curr_word, next_word):
             #   transition_matrix[vocab[next_word]][vocab[curr_word]] += 10
             if next_word in keyword_dict and transition_matrix[vocab[next_word]][vocab[curr_word]] < 100:
-                transition_matrix[vocab[next_word]][vocab[curr_word]] += 10 * keyword_dict[next_word]
+                transition_matrix[vocab[next_word]][vocab[curr_word]] += 1000 * keyword_dict[next_word]
             else:        
                 transition_matrix[vocab[next_word]][vocab[curr_word]] += 1
 
@@ -96,9 +96,10 @@ def main(comments, n, step = 1):
     vocab = {word: i for i, word in enumerate(tokens)}
 
 
-    keyword_dict = keyword_extraction.keyword_extraction(input('Eder fråga, ädle riddare:'))
+    keyword_dict = keyword_extraction.keyword_extraction(input('Eder fråga, ädle riddare: '))
+    print(f'Följande nyckelord identifierades i eder fråga: {keyword_dict}')
 
-
+    print(f'Eder inteligenta betjänt har funderat och kommit fram till följande:')
     transition_matrix = init_matrix(tokens, vocab, comments, keyword_dict)
     random_walk(transition_matrix, n, tokens, vocab, step)
 

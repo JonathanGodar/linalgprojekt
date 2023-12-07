@@ -2,6 +2,8 @@ import numpy as np
 import random
 import nltk
 import keyword_extraction
+from collections import deque
+import math
 #nltk.download('averaged_perceptron_tagger')
 punct = '.,!?'
 
@@ -48,21 +50,33 @@ def init_matrix(tokens, vocab, comments, keyword_dict):
     transition_matrix = transition_matrix / transition_matrix.sum(axis=0, keepdims=True)
     return transition_matrix
 
+def sample_next_word(transition_matricies, word_consideration_window, tokens, vocab):
+    curr_column = np.zeros(len(tokens))
+    for step, word in enumerate(word_consideration_window):
+        curr_column += transition_matricies[step][:, vocab[word]] * (math.e ** -step)
 
-def sample_next_word(transition_matrix, curr_word, tokens, vocab):
-    curr_column = transition_matrix[:, vocab[curr_word]]
-    next_word = random.choices(tokens, weights = curr_column)[0]
+    weights = curr_column / curr_column.sum(keepdims=True)
+    next_word = random.choices(tokens, weights)[0]
     return next_word
 
+def random_walk(transition_matrix, iterations, tokens, vocab, step):
+    transition_matricies = [transition_matrix]
+    for _ in range(step -1):
+        transition_matricies.append(transition_matricies[-1] @ transition_matrix)
+    
+    word_consideration_window = deque(maxlen=step)
+    word_consideration_window.appendleft('.')
 
-def random_walk(transition_matrix, iterations, tokens, vocab):
-    curr_word = sample_next_word(transition_matrix, '.', tokens, vocab)
+    curr_word = sample_next_word(transition_matricies, word_consideration_window, tokens, vocab)
     print(curr_word[0].upper() + curr_word[1:], end = '')
+
     i = 0
     while i < iterations or curr_word not in punct or curr_word == ',':
         #the following part makes the text more grammatically correct. 
         last_word = curr_word
-        curr_word = sample_next_word(transition_matrix, curr_word, tokens, vocab)
+        curr_word = sample_next_word(transition_matricies, word_consideration_window, tokens, vocab)
+        word_consideration_window.appendleft(curr_word)
+
         if curr_word not in punct and last_word not in punct:
             print(' ' + curr_word, end = '')
         elif curr_word not in punct:
@@ -74,9 +88,9 @@ def random_walk(transition_matrix, iterations, tokens, vocab):
         else: 
             print(curr_word, end = '')
         i += 1
+    pass
 
-
-def main(comments, n):
+def main(comments, n, step = 1):
     comments = read_text(comments) # 2d array of tokens
     tokens = list(set(word for comment in comments for word in comment))
     vocab = {word: i for i, word in enumerate(tokens)}
@@ -86,7 +100,7 @@ def main(comments, n):
 
 
     transition_matrix = init_matrix(tokens, vocab, comments, keyword_dict)
-    random_walk(transition_matrix, n, tokens, vocab)
+    random_walk(transition_matrix, n, tokens, vocab, step)
 
 
 if __name__ == '__main__':

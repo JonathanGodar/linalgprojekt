@@ -1,7 +1,7 @@
 import numpy as np
 import random
 import nltk
-nltk.download('averaged_perceptron_tagger')
+#nltk.download('averaged_perceptron_tagger')
 import keyword_extraction
 from collections import deque
 import math

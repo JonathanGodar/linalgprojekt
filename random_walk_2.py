@@ -1,7 +1,7 @@
 import numpy as np
 import random
 import nltk
-#nltk.download('averaged_perceptron_tagger')
+nltk.download('averaged_perceptron_tagger')
 punct = '.,!?'
 
 
@@ -20,10 +20,12 @@ def word_check(word1, word2):
     try:
         w1 = nltk.pos_tag([word1])[0][1]
         w2 = nltk.pos_tag([word2])[0][1]
+        print(word1, w1, word2, w2)
         if (w1 == 'JJ' and w2 == 'NN') or (w1 == 'JJ' and w2 == 'JJ') or (w1 == 'PRP' and w2 == 'VB') or (w1 == 'DT' and w2 == 'NN'):
             return True
         return False
-    except:
+    except Exception as error:
+        print(error)
         return False
 
 def init_matrix(tokens, vocab, comments):
@@ -37,7 +39,7 @@ def init_matrix(tokens, vocab, comments):
         for i in range(len(comment) - 1):
             curr_word, next_word = comment[i], comment[i + 1]
             if word_check(curr_word, next_word):
-                transition_matrix[vocab[next_word]][vocab[curr_word]] += 3
+                transition_matrix[vocab[next_word]][vocab[curr_word]] += 10
             transition_matrix[vocab[next_word]][vocab[curr_word]] += 1
 
 # Convert counts to probabilities
@@ -73,10 +75,11 @@ def random_walk(transition_matrix, iterations, tokens, vocab):
 
 
 def main():
-    comments = read_text([['white', 'the'], ['white', 'mouse']]) # 2d array of tokens
+    comments = read_text([['white', 'be', 'the', 'mouse', 'been', ',', 'but', 'also', 'very', 'black', '!'], ['white', 'mouse']]) # 2d array of tokens
     tokens = list(set(word for comment in comments for word in comment))
     vocab = {word: i for i, word in enumerate(tokens)}
     transition_matrix = init_matrix(tokens, vocab, comments)
+    print(transition_matrix, vocab)
     random_walk(transition_matrix,  10, tokens, vocab)
 
 
